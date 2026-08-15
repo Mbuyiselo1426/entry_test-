@@ -39,6 +39,14 @@ contract DecentralisedRaffle {
     // - You also need the number of UNIQUE players, for the 3-player minimum.
     // - The pot is just this contract's balance.
 
+    address[] private entries;
+
+    mapping(address => uint256) private entryCounts;
+    mapping(address => bool) private hasEntered;
+
+    address[] private uniquePlayers;
+    uint256 private uniquePlayerCount;
+
     constructor() {
         owner = msg.sender;
         raffleId = 1;
@@ -66,9 +74,26 @@ contract DecentralisedRaffle {
     // - If this is the caller's first ever entry this round, they are a new
     //   unique player
     // - Emit RaffleEntered(msg.sender, <this player's total entries so far>)
-    function enterRaffle() external payable {
-        // Your implementation here
-        
+    function enterRaffle() external payable whenNotPaused {
+        require(
+            msg.value >= MINIMUM_ENTRY,
+            "Entry fee too low"
+        );
+
+        entries.push(msg.sender);
+
+        entryCounts[msg.sender]++;
+
+        if (!hasEntered[msg.sender]) {
+            hasEntered[msg.sender] = true;
+            uniquePlayers.push(msg.sender);
+            uniquePlayerCount++;
+        }
+
+        emit RaffleEntered(
+            msg.sender,
+            entryCounts[msg.sender]
+        );
     }
 
     // -----------------------------------------------------------------------
@@ -98,7 +123,60 @@ contract DecentralisedRaffle {
     // in production instead. That explanation carries the marks here, not the
     // code.
     function selectWinner() external onlyOwner {
-        // Your implementation here
+        require(
+            block.timestamp >= raffleStartTime + RAFFLE_DURATION,
+            "Raffle duration not reached"
+        );
+
+        require(
+            uniquePlayerCount >= 3,
+            "Need at least 3 unique players"
+        );
+
+        uint256 pot = address(this).balance;
+
+        uint256 randomNumber = uint256(
+            keccak256(
+                abi.encodePacked(
+                    block.timestamp,
+                    msg.sender
+                )
+            )
+        );
+
+        uint256 winningIndex = randomNumber % entries.length;
+        address winner = entries[winningIndex];
+
+        uint256 prizeAmount = (pot * 90) / 100;
+        uint256 ownerAmount = pot - prizeAmount;
+
+        // Reset the current round before sending ETH.
+        // This also prevents the same raffle from being selected twice.
+        for (uint256 i = 0; i < uniquePlayers.length; i++) {
+            entryCounts[uniquePlayers[i]] = 0;
+            hasEntered[uniquePlayers[i]] = false;
+        }
+
+        delete entries;
+        delete uniquePlayers;
+
+        uniquePlayerCount = 0;
+
+        uint256 currentRaffleId = raffleId;
+        raffleId++;
+        raffleStartTime = block.timestamp;
+
+        (bool winnerPaid, ) = winner.call{value: prizeAmount}("");
+        require(winnerPaid, "Winner payment failed");
+
+        (bool ownerPaid, ) = owner.call{value: ownerAmount}("");
+        require(ownerPaid, "Owner payment failed");
+
+        emit WinnerSelected(
+            currentRaffleId,
+            winner,
+            prizeAmount
+        );
     }
 
     // -----------------------------------------------------------------------
@@ -108,11 +186,15 @@ contract DecentralisedRaffle {
     // - Owner only, both functions
     // - Set isPaused, and emit RafflePaused() / RaffleUnpaused()
     function pause() external onlyOwner {
-        // Your implementation
+        isPaused = true;
+
+        emit RafflePaused();
     }
 
     function unpause() external onlyOwner {
-        // Your implementation
+        isPaused = false;
+
+        emit RaffleUnpaused();
     }
 
     // -----------------------------------------------------------------------
@@ -121,22 +203,22 @@ contract DecentralisedRaffle {
 
     /// @notice The current pot, in wei
     function getPot() external view returns (uint256) {
-        // Your implementation here
+        return address(this).balance;
     }
 
     /// @notice How many entries this player has bought this round
     function getEntryCount(address player) external view returns (uint256) {
-        // Your implementation here
+        return entryCounts[player];
     }
 
     /// @notice Total number of entries this round, counting repeats
     function getPlayerCount() external view returns (uint256) {
-        // Your implementation here
+        return entries.length;
     }
 
     /// @notice Number of distinct addresses that have entered this round
     function getUniquePlayerCount() external view returns (uint256) {
-        // Your implementation here
+        return uniquePlayerCount;
     }
 
     // BONUS (not auto-marked, describe it in PartB_Design.md instead):
