@@ -68,6 +68,13 @@ contract FreelanceBountyBoard {
     // - Emit FreelancerRegistered(msg.sender, skill)
     function registerFreelancer(string calldata skill) external {
         // Your implementation here
+        require(!registered[msg.sender], "Already registered");
+        require(bytes(skill).length > 0, "Skill cannot be empty");
+
+        registered[msg.sender] = true;
+        freelancerSkills[msg.sender] = skill;
+
+        emit FreelancerRegistered(msg.sender, skill);
     }
 
     // -----------------------------------------------------------------------
@@ -88,6 +95,21 @@ contract FreelanceBountyBoard {
         returns (uint256)
     {
         // Your implementation here
+        require(msg.value > 0, "Bounty amount must be greater than zero");
+
+        bountyCount++;
+
+        bounties[bountyCount] = Bounty({
+        employer: msg.sender,
+        description: description,
+        skillRequired: skillRequired,
+        amount: msg.value,
+        status: Status.Open
+    });
+
+    emit BountyPosted(bountyCount, msg.sender, msg.value);
+
+    return bountyCount;
     }
 
     // -----------------------------------------------------------------------
@@ -103,8 +125,31 @@ contract FreelanceBountyBoard {
     // Hint: Solidity cannot compare strings with ==. Compare hashes instead:
     //   keccak256(bytes(a)) == keccak256(bytes(b))
     function applyForBounty(uint256 bountyId) external {
-        // Your implementation here
-    }
+      require(registered[msg.sender], "Not registered");
+
+    require(
+        bountyId > 0 && bountyId <= bountyCount,
+        "Bounty does not exist"
+    );
+
+    Bounty storage bounty = bounties[bountyId];
+
+    require(bounty.status == Status.Open, "Bounty is not open");
+
+    require(
+        keccak256(bytes(freelancerSkills[msg.sender])) ==
+        keccak256(bytes(bounty.skillRequired)),
+        "Skill does not match"
+    );
+
+    require(
+        !applications[bountyId][msg.sender],
+        "Already applied"
+    );
+
+    applications[bountyId][msg.sender] = true;
+
+    emit AppliedForBounty(bountyId, msg.sender);}
 
     // -----------------------------------------------------------------------
     // TODO 4: submitWork
@@ -116,6 +161,26 @@ contract FreelanceBountyBoard {
     // - Emit WorkSubmitted(bountyId, msg.sender, submissionUrl)
     function submitWork(uint256 bountyId, string calldata submissionUrl) external {
         // Your implementation here
+           require(
+        applications[bountyId][msg.sender],
+        "You have not applied"
+        );
+
+    require(
+        bountyId > 0 && bountyId <= bountyCount,
+        "Bounty does not exist"
+    );
+
+    Bounty storage bounty = bounties[bountyId];
+
+    require(
+        bounty.status == Status.Open,
+        "Bounty is not open"
+    );
+
+    bounty.status = Status.Submitted;
+
+    emit WorkSubmitted(bountyId, msg.sender, submissionUrl);
     }
 
     // -----------------------------------------------------------------------
@@ -136,6 +201,38 @@ contract FreelanceBountyBoard {
     // rather than transfer() or send().
     function approveAndPay(uint256 bountyId, address freelancer) external {
         // Your implementation here
+            require(
+        bountyId > 0 && bountyId <= bountyCount,
+        "Bounty does not exist"
+    );
+
+        Bounty storage bounty = bounties[bountyId];
+
+        require(
+        msg.sender == bounty.employer,
+        "Only employer can approve"
+        );
+
+        require(
+        bounty.status == Status.Submitted,
+        "Bounty not submitted"
+        );
+
+        require(
+        applications[bountyId][freelancer],
+        "Freelancer did not apply"
+    );
+
+    uint256 amount = bounty.amount;
+
+    // EFFECTS
+    bounty.status = Status.Completed;
+
+    // INTERACTION
+    (bool ok, ) = freelancer.call{value: amount}("");
+    require(ok, "Transfer failed");
+
+    emit BountyPaid(bountyId, freelancer, amount);
     }
 
     // -----------------------------------------------------------------------
@@ -145,16 +242,24 @@ contract FreelanceBountyBoard {
     /// @notice True if this address has registered as a freelancer
     function isRegistered(address freelancer) external view returns (bool) {
         // Your implementation here
+         return registered[freelancer];
     }
 
     /// @notice The skill this freelancer registered with ("" if unregistered)
     function getSkill(address freelancer) external view returns (string memory) {
         // Your implementation here
+         return freelancerSkills[freelancer];
+        
     }
 
     /// @notice True if this freelancer applied for this bounty
     function hasApplied(uint256 bountyId, address freelancer) external view returns (bool) {
         // Your implementation here
+            external
+            view
+        returns (bool)
+        {
+    return applications[bountyId][freelancer];
     }
 
     /// @notice All of a bounty's details, in this exact order
@@ -170,6 +275,15 @@ contract FreelanceBountyBoard {
         )
     {
         // Your implementation here
+            Bounty storage bounty = bounties[bountyId];
+
+    return (
+        bounty.employer,
+        bounty.description,
+        bounty.skillRequired,
+        bounty.amount,
+        bounty.status
+    );
     }
 
     // BONUS (not auto-marked, describe it in PartB_Design.md instead):
