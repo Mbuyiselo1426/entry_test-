@@ -49,7 +49,11 @@ you show you understand what that costs.
 - What would you use in production instead, and why is that better?
 
 [Write your response here]
+The raffle randomness depends on blockchain block data, such as the block timestamp and block hash.
 
+A block validator/miner can influence some of this block data, so they could potentially manipulate the result to give themselves or someone else a better chance of winning.
+
+In production, I would use Chainlink VRF instead. It provides a verifiable random number that is much harder to manipulate, making the raffle fairer and more secure.
 ---
 
 ### 4. Trade-offs & Future Improvements
@@ -59,7 +63,9 @@ you show you understand what that costs.
   tiers, gas optimisation)
 
 [Write your response here]
+I kept the implementation simple so I could complete the main requirements. I did not implement a full dispute or refund system.
 
+With another day, I would add a dispute resolution system, refunds if a bounty is cancelled, and different prize tiers for the raffle. I would also look for ways to reduce gas costs and make the contracts more efficient.
 ---
 
 ## REAL-WORLD DEPLOYMENT CONCERNS
@@ -89,6 +95,19 @@ you show you understand what that costs.
 - What breaks first?
 
 [Write your response here]
+The most expensive function is postBounty because it creates and stores a new bounty on the blockchain.
+
+Using the same calculation from Part A Question 2, if the transaction uses about 100,000 gas:
+
+100,000 × 20 gwei = 0.002 ETH
+
+At $3,000 per ETH:
+
+0.002 × $3,000 = $6
+
+So the transaction would cost roughly $6.
+
+For users with limited income, this may be too expensive. I would use a Layer 2 network with lower gas fees, or redesign some operations to reduce the amount of data stored directly on the blockchain.
 
 ---
 
@@ -102,10 +121,14 @@ you show you understand what that costs.
   it.)
 
 [Write your response here]
+The hardest step for a first-time user would be creating a wallet and getting test ETH.
 
+I would make the app guide the user through creating or connecting a wallet and clearly explain each step. I would also make the transaction buttons and costs easy to understand.
+
+For a real deployment, I would first use the Sepolia testnet. Testers could create a wallet, connect it to Sepolia, and use a Sepolia faucet to receive free test ETH. They could then use that ETH to test the contract without spending real money.
 ---
 
-## MY LEARNING APPROACH
+## MY LEARNING APPROACH 
 
 ### Resources I Used
 
@@ -113,6 +136,10 @@ Be specific. "The Cyfrin course" is not a resource; "Blockchain Basics, The
 Oracle Problem" is. List 3-5.
 
 [List your resources]
+The Africa Blockchain Club assessment instructions and contract requirements.
+Solidity documentation/examples to understand Solidity syntax and smart-contract concepts.
+Remix IDE to write, compile, and test the Solidity contracts.
+AI assistance to help me understand errors, security concepts, and how the contract requirements should be implemented.
 
 ---
 
@@ -123,11 +150,22 @@ Oracle Problem" is. List 3-5.
 - What you know now that you did not this morning
 
 [Write down your challenges]
+My biggest challenge was understanding how the different parts of a smart contract work together, especially payments, access control, and security.
+
+I got unstuck by breaking the requirements into smaller functions and using Remix to compile and test my code. I also used AI to explain errors and concepts that I did not understand.
+
+Today I learned more about how Solidity stores data, how ETH payments work in a contract, why the order of updating state before sending ETH matters, and why blockchain block data is not ideal for secure randomness.
 
 ---
 
 ### What I'd Learn Next
 
 [Write your future learning goals]
+Solidity and smart-contract development.
+Smart-contract security and common attacks.
+How to properly test contracts with Hardhat.
+Chainlink VRF and secure randomness.
+Gas optimisation and Layer 2 networks.
+How to deploy a smart contract and connect it to a frontend.
 
 ---
