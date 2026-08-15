@@ -62,6 +62,10 @@ database?"*
 [2-3 sentences. What is the actual property a blockchain provides here? Name one
 honest cost of choosing it.]
 
+A blockchain lets everyone veryify the same record so no 
+no single person can change the history.This can be useful
+when people do not trust one central or middle man authority
+
 ---
 
 ### Question 2: Gas Costs (3 marks + 2 for reasoning)
