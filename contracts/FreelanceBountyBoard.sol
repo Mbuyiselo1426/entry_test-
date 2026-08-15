@@ -39,6 +39,20 @@ contract FreelanceBountyBoard {
     // - What does a bounty need to remember? (employer, description, skill,
     //   amount, status) A struct is a good fit here.
     // - How do you remember who applied for which bounty?
+    struct Bounty {
+    address employer;
+    string description;
+    string skillRequired;
+    uint256 amount;
+    Status status;
+            }
+
+    mapping(address => bool) private registered;
+    mapping(address => string) private freelancerSkills;
+
+    mapping(uint256 => Bounty) private bounties;
+
+    mapping(uint256 => mapping(address => bool)) private applications;
 
     constructor() {
         owner = msg.sender;
