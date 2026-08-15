@@ -163,14 +163,15 @@ contract FreelanceBountyBoard {
     // - Emit WorkSubmitted(bountyId, msg.sender, submissionUrl)
     function submitWork(uint256 bountyId, string calldata submissionUrl) external {
         // Your implementation here
-        require(
-            applications[bountyId][msg.sender],
-            "You have not applied"
-        );
 
         require(
             bountyId > 0 && bountyId <= bountyCount,
             "Bounty does not exist"
+        );
+
+        require(
+            applications[bountyId][msg.sender],
+            "You have not applied"
         );
 
         Bounty storage bounty = bounties[bountyId];
