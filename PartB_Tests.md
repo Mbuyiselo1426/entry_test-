@@ -37,6 +37,15 @@ the auto-marker checked. You do not have to write the code - just show you can
 see the gap.
 
 [Write your response here]
+Test file and name: test/FreelanceBountyBoard.test.js — allows a registered freelancer with the correct skill to apply for a bounty.
+
+What it checks: It checks that a freelancer can apply when their registered skill matches the bounty's required skill.
+
+Steps: Register the freelancer with the skill "solidity", create a bounty requiring "solidity", apply for the bounty, and check that the application was recorded.
+
+Expected result: The application is recorded and hasApplied() returns true.
+
+Does it pass? No — I was unable to run the test successfully because of the Hardhat/module configuration error.
 
 ---
 
@@ -62,6 +71,15 @@ it is in `grading/tests/DecentralisedRaffle.grading.test.js` and you are welcome
 to read it.)
 
 [Write your response here]
+Test file and name: test/DecentralisedRaffle.test.js — allows a player to enter the raffle with the minimum entry fee.
+
+What it checks: It checks that the player's entry is recorded correctly.
+Steps: Deploy the raffle, send 0.01 ETH to enterRaffle(), and check the player's entry count and total number of entries.
+
+Expected result: The player's entry count is 1 and the total number of entries is 1.
+Does it pass? No — I was unable to run the test successfully because of the Hardhat/module configuration error.
+
+I would not test for a specific winner because the winner is random. I would instead check things that must always be true, such as the winner being one of the players who entered and the winner receiving 90% of the raffle pot.
 
 ---
 
@@ -79,6 +97,12 @@ An honest "yes, this attack works against my code, and here is the fix" scores
 full marks here. Claiming your contract is perfect scores nothing.
 
 [Write your response here]
+Contract: DecentralisedRaffle
+My attack: I would try to influence the raffle result by controlling when selectWinner() is called, because the contract uses the block timestamp as part of its random number.
+
+Does it work against my implementation? Yes. The owner can choose when to call selectWinner(), which can influence the timestamp used for the random result.
+
+If it works, what would fix it? I would use Chainlink VRF in a real application because it provides a more secure and unpredictable random number.
 
 ---
 
