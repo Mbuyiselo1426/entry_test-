@@ -83,7 +83,7 @@ You send a simple ETH transfer on Ethereum.
 - **C)** 0.00042 ETH (about $1.26)
 - **D)** 0.0042 ETH (about $12.60)
 
-**Your Answer:** [A/B/C/D]
+**Your Answer:** [A/B/C/D] C
 
 **Your Calculation:**
 
@@ -113,12 +113,16 @@ Your smart contract needs to know the current ETH/USD price.
   in a future upgrade.
 - **D)** Because API providers block blockchain nodes for security reasons.
 
-**Your Answer:** [A/B/C/D]
+**Your Answer:** [A/B/C/D] C
 
 **Your Reasoning:**
 [2-3 sentences. Why would a single company running the only oracle undermine the
 point of building on a blockchain? What does a decentralised oracle network do
 about that?]
+
+Smart contracts cannot access the internet directly.
+Oracles bring real-world data onto the blockchain.
+Decentralized oracles ,more trust because they don't rely on just one provider.
 
 ---
 
@@ -137,12 +141,14 @@ about that?]
   attacker their own stake. The cost of that stake is also what makes Sybil
   attacks - one actor spinning up thousands of fake nodes - uneconomic.
 
-**Your Answer:** [A/B/C/D]
+**Your Answer:** [A/B/C/D] D
 
 **Your Reasoning:**
 [2-3 sentences. What does an attacker actually need to acquire to threaten a PoS
 chain, and what do they stand to lose? Name one difference from Proof of Work.]
 
+
+To attack a Pos blockchain , an would to control a large amount of crypto.Proof os stake secures the network using locked up security.
 ---
 
 ### Question 5: Layer 2s and Rollups (3 marks + 2 for reasoning)
@@ -161,11 +167,15 @@ chain, and what do they stand to lose? Name one difference from Proof of Work.]
 - **D)** It reduces gas costs by lowering the base fee on Ethereum itself
   whenever the rollup is active.
 
-**Your Answer:** [A/B/C/D]
+**Your Answer:** [A/B/C/D] A
 
 **Your Reasoning:**
 [2-3 sentences. Most rollups today run a single centralised sequencer. What can
 that sequencer do to you, and what can it *not* do?]
+
+
+A centralized sequncer can order transaction and censor them ,
+so you can have to trust it to process transaction fair.It gennerally cannot steal your funds or change the rules of Etherium settlement layer
 
 ---
 
@@ -188,11 +198,14 @@ them.
 - **D)** The seed phrase is just a backup of your public address, which is why it
   is safe to share with support staff if you get stuck.
 
-**Your Answer:** [A/B/C/D]
+**Your Answer:** [A/B/C/D] C
 
 **Your Reasoning:**
 [2-3 sentences. What does a signature prove? What is the trade-off a user accepts
 by holding their own keys, and what does account abstraction do to soften it?]
+
+A digital signature proves that the person controlling the private key approved and signed the transaction, without taking out the private key itself.Account abstraction can make 
+this eaasir by allowing features like social recovery.
 
 ---
 
