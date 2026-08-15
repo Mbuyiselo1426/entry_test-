@@ -1,4 +1,4 @@
-require("@nomicfoundation/hardhat-toolbox");
+import("@nomicfoundation/hardhat-toolbox");
 
 /**
  * Used by the auto-marker to run YOUR tests in test/ and check at least one of
